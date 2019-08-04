@@ -1,0 +1,191 @@
+﻿@page
+@using TaskManager.Helpers
+@model TaskManager.Pages.TasksModel
+@{
+    ViewData["Title"] = "Список задач";
+    var tasksTree = HtmlTasksHelper.GetTasksTree(Model.Tasks);
+}
+<h2>@ViewData["Title"]</h2>
+
+<div class="block-left">
+    <a href="/Create">Добавить задачу</a>
+    @Html.Raw(tasksTree)
+</div>
+
+<div class="block-right">
+    <div id="tasksContainer" style="visibility:hidden">
+        <table border="1" cellpadding="7" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>
+                        @Resources.Strings.Name
+                    </th>
+                    <th>
+                        @Resources.Strings.Description
+                    </th>
+                    <th>
+                        @Resources.Strings.Perfomers
+                    </th>
+                    <th>
+                        @Resources.Strings.RegistrationDate
+                    </th>
+                    <th>
+                        @Resources.Strings.Status
+                    </th>
+                    <th>
+                        @Resources.Strings.PlannedLeadTime
+                    </th>
+                    <th>
+                        @Resources.Strings.ActualLeadTime
+                    </th>
+                    <th>
+                        @Resources.Strings.CompletionDate
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="taskRow">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <input type="button" onclick="deleteTask()" style="display:inherit; float:right" value="@Resources.Strings.Delete">
+        <input type="button" onclick="editTask()" style="display:inherit; float:right" value="@Resources.Strings.Edit">
+        <input type="button" onclick="addSubTask()" style="display:inherit; float:right" value="@Resources.Strings.AddSubTask">
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        var list = document.getElementById('list');
+        var selectedLi;
+
+        list.onclick = function (event) {
+            let target = event.target; // где был клик?
+
+            if (target.tagName != 'LI') return; // не на LI? тогда не интересует
+            highlight(target); // подсветить LI
+            updateTable();
+        };
+
+        function updateTable() {
+            let xhr = new XMLHttpRequest();
+            xhr.open('get', "api/task/" + selectedLi.id, true);
+            xhr.send();
+            xhr.onreadystatechange = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    let tasksContainer = document.getElementById('tasksContainer');
+                    let task = JSON.parse(xhr.response);
+                    let row = document.getElementById('taskRow');
+                    let fields = row.getElementsByTagName('TD');
+
+                    tasksContainer.style.visibility = "visible";
+                    fields[0].innerHTML = task.name;
+                    fields[1].innerHTML = task.description;
+                    fields[2].innerHTML = task.perfomers;
+                    fields[3].innerHTML = task.registrationDate.split('T')[0];
+                    fields[4].innerHTML = task.status;
+                    if (task.subTasks != "") {
+                        fields[5].innerHTML = +(task.plannedLeadTime + getSubTasksPlannedLeadTime(task.subTasks)).toFixed(2) + " (" + task.plannedLeadTime + " + " + getSubTasksPlannedLeadTime(task.subTasks) + ")";
+                        fields[6].innerHTML = +(task.actualLeadTime + getSubTasksActualLeadTime(task.subTasks)).toFixed(2) + " (" + task.actualLeadTime + " + " + getSubTasksActualLeadTime(task.subTasks) + ")";
+                    } else {
+                        fields[5].innerHTML = task.plannedLeadTime;
+                        fields[6].innerHTML = task.actualLeadTime;
+                    }
+                    fields[7].innerHTML = task.completionDate.split('T')[0];
+                }
+            };
+        }
+
+        function getSubTasksPlannedLeadTime(subTasks) {
+            var sum = 0;
+            if (subTasks != null) {
+                for (var i = 0; i < subTasks.length; i++) {
+                    sum += subTasks[i].plannedLeadTime;
+                    sum += getSubTasksPlannedLeadTime(subTasks[i].subTasks);
+                }
+            }
+            return sum;
+        }
+
+        function getSubTasksActualLeadTime(subTasks) {
+            var sum = 0;
+            if (subTasks != null) {
+                for (var i = 0; i < subTasks.length; i++) {
+                    sum += subTasks[i].actualLeadTime;
+                    sum += getSubTasksActualLeadTime(subTasks[i].subTasks);
+                }
+            }
+            return sum;
+        }
+
+        function highlight(li) {
+            if (selectedLi) { // убрать существующую подсветку, если есть
+                selectedLi.style.border = 'none';
+            }
+            selectedLi = li;
+            selectedLi.style.border = "1px solid blue"; // подсветить новый li
+        }
+
+        function addSubTask() {
+            let id = selectedLi.id;
+            window.location = window.location += "Create?id=" + id;
+        }
+
+        function editTask() {
+            let id = selectedLi.id;
+            window.location = window.location += "Edit?id=" + id;
+        }
+
+        function deleteTask() {
+            let id = selectedLi.id;
+            let xhr = new XMLHttpRequest();
+            xhr.open('delete', "api/task/" + id, true);
+            xhr.send();
+            xhr.onreadystatechange = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    location.reload();
+                }
+            };
+        }
+    </script>
+}
+
+<style>
+    label {
+        margin-bottom: 0;
+        margin-top: 10px;
+        width: 100%;
+        text-align: end;
+    }
+
+    ul {
+        padding: 0;
+        margin-left: 20px;
+    }
+
+    li {
+        list-style-type: none; /* Убираем маркеры */
+    }
+
+    .block-left {
+        width: 15%;
+        height: auto;
+        overflow: auto;
+        border: 1px solid #000;
+        float: left;
+    }
+
+    .block-right {
+        width: 85%;
+        height: auto;
+        overflow: auto;
+    }
+</style>
