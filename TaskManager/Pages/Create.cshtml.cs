@@ -31,21 +31,14 @@ namespace TaskManager.Pages
 
             if (id == null)
             {
-                Task.RegistrationDate = DateTime.Now;
-                Task.ActualLeadTime = 0;
-                Task.Status = Resources.Strings.Assigned;
-                Task.SubTasks = new List<Models.Task>();
+                Task.IsMainTask = true;                
 
                 _context.Task.Add(Task);
                 
             }
             else
             {
-                var mainTask = _context.Task.Single(task => task.ID == id);
-                Task.RegistrationDate = DateTime.Now;
-                Task.ActualLeadTime = 0;
-                Task.Status = Resources.Strings.Assigned;
-                Task.SubTasks = new List<Models.Task>();
+                var mainTask = _context.Task.FirstOrDefault(task => task.ID == id);
 
                 mainTask.SubTasks.Add(Task);
                 _context.Task.Update(mainTask);

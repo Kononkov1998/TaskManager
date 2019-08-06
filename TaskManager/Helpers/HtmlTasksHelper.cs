@@ -12,18 +12,15 @@ namespace TaskManager.Helpers
         {
             string htmlOutput = string.Empty;
 
-            if (tasks != null)
+            htmlOutput += "<ul id=\"list\">";
+            foreach (Models.Task task in tasks.Where(task => task.IsMainTask == true))
             {
-                htmlOutput += "<ul id=\"list\">";
-                foreach (Models.Task task in tasks.Where(task => task.IsMainTask == true))
-                {
-                    htmlOutput += "<li id=\"" + task.ID + "\">";
-                    htmlOutput += task.Name;
-                    htmlOutput += "</li>";
-                    htmlOutput += GetSubTasksTree(task.SubTasks);                    
-                }
-                htmlOutput += "</ul>";
+                htmlOutput += "<li id=\"" + task.ID + "\">";
+                htmlOutput += task.Name;
+                htmlOutput += "</li>";
+                htmlOutput += GetSubTasksTree(task.SubTasks);
             }
+            htmlOutput += "</ul>";
             return htmlOutput;
         }
 
@@ -31,18 +28,15 @@ namespace TaskManager.Helpers
         {
             string htmlOutput = string.Empty;
 
-            if (tasks != null)
+            htmlOutput += "<ul>";
+            foreach (Models.Task task in tasks)
             {
-                htmlOutput += "<ul>";
-                foreach (Models.Task task in tasks)
-                {
-                    htmlOutput += "<li id=\"" + task.ID + "\">";
-                    htmlOutput += task.Name;
-                    htmlOutput += "</li>";
-                    htmlOutput += GetSubTasksTree(task.SubTasks);                    
-                }
-                htmlOutput += "</ul>";
+                htmlOutput += "<li id=\"" + task.ID + "\">";
+                htmlOutput += task.Name;
+                htmlOutput += "</li>";
+                htmlOutput += GetSubTasksTree(task.SubTasks);
             }
+            htmlOutput += "</ul>";
             return htmlOutput;
         }
     }

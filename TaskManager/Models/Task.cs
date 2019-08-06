@@ -26,6 +26,13 @@ namespace TaskManager.Models
 
         public static string[] possibleStatuses = { Resources.Strings.Assigned, Resources.Strings.Perfomed, Resources.Strings.Paused, Resources.Strings.Completed };
 
+        public Task()
+        {
+            Status = Resources.Strings.Assigned;
+            RegistrationDate = DateTime.Now;
+            SubTasks = new List<Task>();
+        }
+
         public double GetSubTasksPlannedLeadTime()
         {
             double sum = 0;

@@ -139,7 +139,7 @@
     <value>Статус "Завершена" может быть присвоен только после статуса "Выполняется".</value>
   </data>
   <data name="CompletionDate" xml:space="preserve">
-    <value>Дата выполнения</value>
+    <value>Дата завершения</value>
   </data>
   <data name="CreateTitle" xml:space="preserve">
     <value>Добавление новой задачи</value>

@@ -106,23 +106,19 @@
 
         function getSubTasksPlannedLeadTime(subTasks) {
             var sum = 0;
-            if (subTasks != null) {
                 for (var i = 0; i < subTasks.length; i++) {
                     sum += subTasks[i].plannedLeadTime;
                     sum += getSubTasksPlannedLeadTime(subTasks[i].subTasks);
                 }
-            }
             return sum;
         }
 
         function getSubTasksActualLeadTime(subTasks) {
             var sum = 0;
-            if (subTasks != null) {
                 for (var i = 0; i < subTasks.length; i++) {
                     sum += subTasks[i].actualLeadTime;
                     sum += getSubTasksActualLeadTime(subTasks[i].subTasks);
                 }
-            }
             return sum;
         }
 

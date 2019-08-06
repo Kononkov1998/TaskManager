@@ -124,7 +124,7 @@ namespace TaskManager.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дата выполнения.
+        ///   Ищет локализованную строку, похожую на Дата завершения.
         /// </summary>
         public static string CompletionDate {
             get {

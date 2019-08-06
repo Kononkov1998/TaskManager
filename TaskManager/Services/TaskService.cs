@@ -28,8 +28,8 @@ namespace TaskManager.Services
         }
         public void Create(Models.Task task, int id)
         {
-            if (id == 0)            
-                _context.Task.Add(task);            
+            if (id == 0)
+                _context.Task.Add(task);
             else
             {
                 var mainTask = Read(id);
@@ -40,18 +40,23 @@ namespace TaskManager.Services
         }
         public Models.Task Read(int id)
         {
-            return ReadAll().Single(t => t.ID == id);
+            return ReadAll().FirstOrDefault(t => t.ID == id);
         }
         public void Update(Models.Task modifiedTask)
         {
-            var task = ReadAll().Single(t => t.ID == modifiedTask.ID);
+            var task = ReadAll().FirstOrDefault(t => t.ID == modifiedTask.ID);
             _context.Update(modifiedTask);
             _context.SaveChanges();
         }
         public void Delete(int id)
         {
-            var task = ReadAll().Single(t => t.ID == id);
-            foreach(Models.Task subTask in task.SubTasks)
+            var task = ReadAll().FirstOrDefault(t => t.ID == id);
+            var deleteList = new List<Models.Task>();
+            foreach (Models.Task subTask in task.SubTasks)
+            {
+                deleteList.Add(subTask);
+            }
+            foreach (Models.Task subTask in deleteList)
             {
                 Delete(subTask.ID);
             }

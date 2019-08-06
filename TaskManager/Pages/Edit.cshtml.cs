@@ -90,33 +90,28 @@ namespace TaskManager.Pages.Tasks
 
         private void CompleteSubTasks(List<Models.Task> subTasks)
         {
-            if (subTasks != null)
+            foreach (Models.Task subTask in subTasks)
             {
-                foreach (Models.Task subTask in subTasks)
-                {
-                    var fullSubTask = _context.Task.Include(t => t.SubTasks).FirstOrDefault(t => t.ID == subTask.ID);
-                    fullSubTask.Status = Models.Task.possibleStatuses[3];
-                    _context.Attach(fullSubTask).State = EntityState.Modified;
-                    CompleteSubTasks(fullSubTask.SubTasks);
-                }
+                var fullSubTask = _context.Task.Include(t => t.SubTasks).FirstOrDefault(t => t.ID == subTask.ID);
+                fullSubTask.Status = Models.Task.possibleStatuses[3];
+                _context.Attach(fullSubTask).State = EntityState.Modified;
+                CompleteSubTasks(fullSubTask.SubTasks);
             }
         }
 
         private bool CanBeCompleted(List<Models.Task> subTasks)
         {
-            if (subTasks != null)
+            foreach (Models.Task subTask in subTasks)
             {
-                foreach (Models.Task subTask in subTasks)
-                {
-                    var fullSubTask = _context.Task.AsNoTracking().Include(t => t.SubTasks).FirstOrDefault(t => t.ID == subTask.ID);
+                var fullSubTask = _context.Task.AsNoTracking().Include(t => t.SubTasks).FirstOrDefault(t => t.ID == subTask.ID);
 
-                    if (fullSubTask.Status != Models.Task.possibleStatuses[1] && fullSubTask.Status != Models.Task.possibleStatuses[3])
-                        return false;
+                if (fullSubTask.Status != Models.Task.possibleStatuses[1] && fullSubTask.Status != Models.Task.possibleStatuses[3])
+                    return false;
 
-                    if (!CanBeCompleted(fullSubTask.SubTasks))
-                        return false;
-                }
+                if (!CanBeCompleted(fullSubTask.SubTasks))
+                    return false;
             }
+
             return true;
         }
 
